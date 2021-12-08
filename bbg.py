@@ -1,9 +1,18 @@
 import numpy as np
-from matplotlib.pyplot import contour
+from matplotlib.pyplot import contour, get
 from functools import reduce
 import matplotlib.pyplot as plt
 
 from time import perf_counter as tt
+
+import contextlib 
+from functools import lru_cache
+# dummy implementation
+@contextlib.contextmanager
+def figure_context(*args, **kwargs):
+    fig = plt.figure(*args, **kwargs)
+    yield fig
+    plt.close(fig)
 
 
 Params = dict({'g0':-2.61, 'g1':0.361 , 'g3':0.283, 'g4':0.138, 'Dp':0.015})
@@ -47,14 +56,16 @@ def DOS_fast(ws, Es):
             arc = np.sum(arcs)
             return arc
         return reduce(lambda x,y: x+length_worker(y.vertices), path,0.0)
-    contour_plot = contour(Es, levels = ws)
-    cs = contour_plot.collections
-    res = np.zeros(ws.size)
-    for i, c in enumerate(cs):
-        paths = c.get_paths()
-        l = arc_length(paths)
-        res[i] = l
-    return res
+    with figure_context() as fig:
+        ax = fig.add_subplot(111)
+        contour_plot = ax.contour(Es, levels = ws)
+        cs = contour_plot.collections
+        res = np.zeros(ws.size)
+        for i, c in enumerate(cs):
+            paths = c.get_paths()
+            l = arc_length(paths)
+            res[i] = l
+        return res
 
 def DOSk_fast(ws, Es):
     """Compute FS at set of energies
