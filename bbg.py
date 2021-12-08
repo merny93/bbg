@@ -1,10 +1,13 @@
 import numpy as np
-from numba import jit
 from matplotlib.pyplot import contour
 from functools import reduce
 import matplotlib.pyplot as plt
 
 from time import perf_counter as tt
+
+
+Params = dict({'g0':-2.61, 'g1':0.361 , 'g3':0.283, 'g4':0.138, 'Dp':0.015})
+
 def DOSk(w, Es, eta):
     """ Computes spectral functino A(k;w) = -ImTrG(k;w) / pi
     
@@ -15,7 +18,6 @@ def DOSk(w, Es, eta):
     DOSk = -np.imag( np.sum( 1/(w + 1j*eta -Es), axis=0 ) )/np.pi
     return DOSk
 
-@jit(nopython=True)
 def DOS(ws, Es, eta):
     """ Computes density of states rho(w) = -ImTr\sum_{k}G(k;w)/pi
     
@@ -63,7 +65,7 @@ def DOSk_fast(ws, Es):
         FS ()
     """       
 
-def BLG_H(q, Params, D, B=0):
+def BLG_H(q, Params = Params, D = 0, B=0):
     #constants
     a0 = 0.246 #[nm]
     d = 0.34 #[nm]
@@ -81,11 +83,6 @@ def BLG_H(q, Params, D, B=0):
     p = Params
     (t, t0, t3, t4, Dp) = (p['g0'], p['g1'], p['g3'], p['g4'], p['Dp']) #[eV]
     tp = 0
-    # t0 =0
-    # t3 = 0
-    # t4 = 0
-    # D = 0
-    # t3 = 10.0
     #g0: in-plane NN A-B / A'-B'
     #g1: interlayer NN B-A'
     #g3: interlayer triagonal warping A-B'
@@ -116,7 +113,6 @@ def BLG_H(q, Params, D, B=0):
     mults = [f_k, F_k, np.ones_like(f_k), f_k, f_k, np.ones_like(f_k)]
 
     h_mults = sum(map(lambda x: np.multiply.outer(*x), zip(mults, H_mats)))
-    print(h_mults.shape)
     H = h_mults + h_mults.conjugate().transpose((0,1,3,2))
     return H
     
