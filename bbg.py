@@ -124,7 +124,7 @@ def BLG_H(q, Params = Params, D = 0, B=0):
     mults = [f_k, F_k, np.ones_like(f_k), f_k, f_k, np.ones_like(f_k)]
 
     h_mults = sum(map(lambda x: np.multiply.outer(*x), zip(mults, H_mats)))
-    H = h_mults + h_mults.conjugate().transpose((0,1,3,2))
+    H = h_mults + np.swapaxes(h_mults.conjugate(), -1, -2)
     return H
     
 """
