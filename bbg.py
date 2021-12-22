@@ -116,7 +116,7 @@ def BLG_H(q, Params = Params, D = 0, B=0):
 
     h_k_t3[3,0] = -t3
 
-    h_k_t4[3,2] = -t4
+    h_k_t4[2,3] = -t4
 
     h_v = U/2*np.diag([1,-1,1,-1]) *0.5 # for hermition
 
